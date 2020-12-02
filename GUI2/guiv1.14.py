@@ -1,3 +1,11 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Oct 14 23:17:54 2020
+
+@author: caghangir
+"""
+
 # -*- coding: utf-8 -*-
 """
 Created on Sat Mar 28 16:32:49 2020
@@ -16,11 +24,12 @@ import datetime
 import os
 import sys
 import matplotlib.pyplot as plt
+# import winsound
 # %matplotlib qt
-os.chdir('C:/Users/caghangir/Desktop/PhD/Research/Lucid Dream BCI/Codes/GUI/Log')
+os.chdir('/home/caghangir/Desktop/PhD/LD_BCI/Codes/Lucid-Dream-BCI/GUI2')
 #%% =============== Init ===============
 class GUI:
-    def __init__(self, parentWindow, count=0, clenchingTime=5000, restingTime=2000): #milliseconds
+    def __init__(self, parentWindow, count=0, clenchingTime=3000, restingTime=2000): #milliseconds
        self.window = parentWindow
        # self.window.rowconfigure(2, weight=1)
        self.count = count
@@ -28,16 +37,45 @@ class GUI:
        self.restingTime = restingTime
        self.textLogTime = 3000 #milliseconds
        self.initialize_user_interface()
-       self.real_log_data = np.empty(shape=[0,1])
+       self.real_log_data = np.empty(shape=[0])
        
        #===== Time Points Initialization ======
+       #==== Aligning Process ====
+       self.mainIntro = 3 #sec
+       self.relaxing = 30 + 1 #sec 1 sec is beep sound
+       self.clenchingTeeth = 7 #sec
+       self.LRLR = 7 #sec
+       self.blink = 6 #sec
+       self.finishingBlink = 3 #sec
+       #==== Aligning Process ====
+       
        self.startClenchingTime = 100 #just start clenching time to give big value for skipping first calculation!
        self.endClenchingTime = 0
        self.startRestingTime = 100
        self.endRestingTime = 0
        
-       self.clenchingTimePoints = np.empty(shape=[0,1]) #time array of clenching initial time points
-       self.restingTimePoints = np.empty(shape=[0,1]) #time array of resting initial time points
+       # self.clenchingTimePoints = np.empty(shape=[0,1]) #time array of clenching initial time points
+       # self.restingTimePoints = np.empty(shape=[0,1]) #time array of resting initial time points
+       self.allInitialDateTimes = {
+           'get ready' : None,
+           'relax' : None,
+           'clench teeth' : None,
+           'perform LRLR' : None,
+           'blink' : list(),
+           'left' : list(),
+           'right' : list(),
+           'rest' : list(),
+           'finish' : None,
+           'all events' : list()
+           }
+       
+       self.allLogData = {
+           'real elapsed times' : None,
+           'default elapsed times' : None,
+           'chosen sequence' : None,
+           'elapsed clenching time' : None,
+           'elapsed resting time' : None
+           }
        #===== Time Points Initialization =====
        
     def initialize_user_interface(self):
@@ -100,7 +138,7 @@ class GUI:
         #===== Combobox Clenching Interval ========
         self.comboClInt = ttk.Combobox(self.window)
         self.comboClInt['values']= (2,3,4,5) #clenching times as second
-        self.comboClInt.current(3) #set the selected item
+        self.comboClInt.current(1) #set the selected item
         self.comboClInt.place(relx=0.9, rely=0.01)
         self.comboClInt.bind("<<ComboboxSelected>>", self.changeClenchingInterval)
         #===== Combobox Clenching Interval ========
@@ -189,6 +227,17 @@ class GUI:
         
     def action_text_changer(self, action_type, temp_text):
         self.textAction.set(temp_text)
+        self.lbl.place(relx=0.5, rely=0.5, anchor='center')
+        
+        '''==== Current time Adding ====='''
+        current_time = datetime.datetime.now().strftime('%y-%m-%d_%H-%M-%S.%f')[:-3]
+        if(action_type == 'blink'):
+            self.allInitialDateTimes[action_type].append(current_time)
+        else:
+            self.allInitialDateTimes[action_type] = current_time
+            
+        self.allInitialDateTimes['all events'].append(current_time)
+        '''==== Current time Adding ====='''
         
         #=== Logging =====
         self.endActionTime = time.time()
@@ -203,7 +252,8 @@ class GUI:
     #%% ============== Actions ==================
     def settingSequence(self):
         # self.sequence = self.sequenceCreation()
-        self.sequence = pickle.load(open('Sequences/sequence', 'rb'))
+        self.sequence = pickle.load(open('Sequences/sequence', 'rb')) #82 amount is for all 3 combinations
+        self.sequence = self.sequence[0:60] #decrease a bit
         # dateTime = datetime.datetime.now().strftime('%y-%m-%d_%H-%M-%S')
         # pickle.dump(self.sequence, open('Sequences/' + str(dateTime) ,'wb'))
         
@@ -231,14 +281,21 @@ class GUI:
         self.startActiontime = time.time() # resting() function looks for clenching time so I had to add this one
         self.lbl.config(font=("Arial Bold", 30))
         self.textAction.set('Get Ready!') #3 seconds
-        self.window.after(3000, self.action_text_changer, 'get ready', 'Please relax yourself for\n 30 seconds')
-        self.window.after(33000, self.action_text_changer, 'relax', 'Please clench your teeth\n as much as possible')
-        self.window.after(38000, self.action_text_changer, 'clench teeth', 'Please perform LRLR eye movements\n as much as possible')
-        self.window.after(43000, self.action_text_changer, 'perform LRLR', 'Please blink as much as possible\n 3')
-        self.window.after(45000, self.action_text_changer, 'blink', 'Please blink as much as possible\n 2')
-        self.window.after(47000, self.action_text_changer, 'blink', 'Please blink as much as possible\n 1')
+        '''==== Current time Adding ====='''
+        current_time = datetime.datetime.now().strftime('%y-%m-%d_%H-%M-%S.%f')[:-3]
+        self.allInitialDateTimes['get ready'] = current_time
+        self.allInitialDateTimes['all events'].append(current_time)
+        '''==== Current time Adding ====='''
+        
+        self.window.after(3000, self.action_text_changer, 'relax', 'Close your eyes and \n relax until beep sound')
+        # self.window.after(33000, lambda:winsound.Beep(2500, 1000))
+        self.window.after(34000, self.action_text_changer, 'clench teeth', 'Clench your teeth\n as much as possible')
+        self.window.after(41000, self.action_text_changer, 'perform LRLR', 'Perform LRLR eye movements\n as much as possible')
+        self.window.after(48000, self.action_text_changer, 'blink', 'Blink as much as possible\n 3')
+        self.window.after(50000, self.action_text_changer, 'blink', 'Blink as much as possible\n 2')
+        self.window.after(52000, self.action_text_changer, 'blink', 'Blink as much as possible\n 1')
        
-        self.window.after(49000, lambda:self.resting()) #experiment begin
+        self.window.after(54000, lambda:self.resting()) #experiment begin
     
     def clenching(self, actionType):
         
@@ -255,8 +312,23 @@ class GUI:
       
         if(actionType == '0'):
            self.textAction.set('L')
+           self.lbl.place(relx=0.47, rely=0.5, anchor='center')
+           
+           '''==== Current time Adding ====='''
+           current_time = datetime.datetime.now().strftime('%y-%m-%d_%H-%M-%S.%f')[:-3]
+           self.allInitialDateTimes['left'].append(current_time)
+           self.allInitialDateTimes['all events'].append(current_time)
+           '''==== Current time Adding ====='''
+           
         else:
            self.textAction.set('R')
+           self.lbl.place(relx=0.53, rely=0.5, anchor='center')
+           
+           '''==== Current time Adding ====='''
+           current_time = datetime.datetime.now().strftime('%y-%m-%d_%H-%M-%S.%f')[:-3]
+           self.allInitialDateTimes['right'].append(current_time)
+           self.allInitialDateTimes['all events'].append(current_time)   
+           '''==== Current time Adding ====='''
            
         self.window.update() #window update ne hikmetse ise yaradi!!
         self.count += 1 #next
@@ -279,7 +351,15 @@ class GUI:
         #======= Clenching Time Calculation =====
         
         #======== Resting =======
-        self.textAction.set('✕')
+        self.textAction.set('X')
+        self.lbl.place(relx=0.5, rely=0.5, anchor='center')
+        
+        '''==== Current time Adding ====='''
+        current_time = datetime.datetime.now().strftime('%y-%m-%d_%H-%M-%S.%f')[:-3]
+        self.allInitialDateTimes['rest'].append(current_time)
+        self.allInitialDateTimes['all events'].append(current_time)   
+        '''==== Current time Adding ====='''
+        
         self.window.update() #window update ne hikmetse ise yaradi!!
         #======== Resting =======
         
@@ -287,17 +367,36 @@ class GUI:
         
         #====== If End ========
         if(self.count == self.totalLength):
-            self.finish_protocol()
+            self.last_blinks_protocol()
             return
         #====== If End ========
         
         self.window.after(self.restingTime, self.clenching, self.sequence[self.count])
         
-    def finish_protocol(self):
+    def last_blinks_protocol(self):
         self.textAction.set('Please blink as much as possible')
+        self.lbl.place(relx=0.5, rely=0.5, anchor='center')
+      
+        '''==== Current time Adding ====='''
+        current_time = datetime.datetime.now().strftime('%y-%m-%d_%H-%M-%S.%f')[:-3]
+        self.allInitialDateTimes['blink'].append(current_time)
+        self.allInitialDateTimes['all events'].append(current_time)
+        '''==== Current time Adding ====='''
+        
         self.startActiontime = time.time()
-        # self.window.after(3000, self.textAction.set, 'The End')
-        self.window.after(3000, self.action_text_changer, 'Last blinks', 'The End')
+        self.window.after(3000, self.finish_protocol)
+        
+    def finish_protocol(self):
+
+        self.textAction.set('The End')
+        self.lbl.place(relx=0.5, rely=0.5, anchor='center')
+      
+        '''==== Current time Adding ====='''
+        current_time = datetime.datetime.now().strftime('%y-%m-%d_%H-%M-%S.%f')[:-3]
+        self.allInitialDateTimes['finish'] = current_time
+        self.allInitialDateTimes['all events'].append(current_time)
+        '''==== Current time Adding ====='''        
+
         self.btnBegin.config(state = NORMAL)
         self.btnPause.config(state = DISABLED)
         self.btnReset.config(state = DISABLED)
@@ -306,28 +405,30 @@ class GUI:
         dateTime = datetime.datetime.now().strftime('%y-%m-%d_%H-%M-%S')
         
         self.real_log_data = np.append(self.real_log_data, 3) #manually add
+                
+        '''=========== Save Data ============'''
+        default_log_time = np.array([self.mainIntro, self.relaxing, self.clenchingTeeth, self.LRLR, 2, 2, 2])
+        for i in range(len(self.sequence)):
+            default_log_time = np.append(default_log_time, self.restingTime / 1000)
+            default_log_time = np.append(default_log_time, self.clenchingTime / 1000)
+        default_log_time = np.append(default_log_time, 3) #blinks
         
-        #=== Log-data to EEG data conversion ======
-        default_log_data = self.default_log_data_creator(Fs=100, sequence=self.sequence)
-        dynamic_log_data = self.dynamic_log_data_creator(Fs=100)
-        #=== Log-data to EEG data conversion ======
-        
-        #==== Save Data ====
-        pickle.dump(self.real_log_data, open('Log Data/' + 'real_log_data_' + str(dateTime) ,'wb'))
-        pickle.dump(default_log_data, open('Log Data/' + 'default_log_EEG_data_' + str(dateTime) ,'wb'))
-        pickle.dump(dynamic_log_data, open('Log Data/' + 'dynamic_log_EEG_data_' + str(dateTime) ,'wb'))
-        #==== Save Data ====
+        self.allLogData['real elapsed times'] = self.real_log_data
+        self.allLogData['default elapsed times'] = default_log_time
+        self.allLogData['chosen sequence'] = self.sequence
+        self.allLogData['elapsed clenching time'] = self.clenchingTime / 1000
+        self.allLogData['elapsed resting time'] = self.restingTime / 1000
+       
+        #==== Pickle =====
+        pickle.dump(self.allLogData, open('Log Data/' + 'allLogData_' + str(dateTime), 'wb'))
+        pickle.dump(self.allInitialDateTimes, open('Log Data/' + 'allInitialDateTimes_' + str(dateTime), 'wb'))
+        #==== Pickle =====
+        '''=========== Save Data ============'''
         
         self.textLog.set('Log Data has been saved into the directory!')
         self.lbl4.after(self.textLogTime, self.log_delete)
         #=== Log-data Saving ====
-        
-        #=== Plot ====
-        plt.plot(default_EEG)
-        plt.plot(dynamic_EEG)
-        plt.title('Log Data')
-        plt.legend(['Default Log Data', 'Real Log Data'])
-        #=== Plot ====
+
 #%% ======== Pseudo-random Sequence Creation ==========        
     def sequenceCreation(self):
         pairArray = [['000',0],['001',0],['010',0],['011',0],['100',0],['101',0],['110',0],['111',0]]
@@ -375,85 +476,12 @@ class GUI:
                             sequence = ''.join(sequence)
 						
         return sequence
-#%% ============= Log-data to EEG data conversion =========
-    def default_log_data_creator(self, Fs, sequence):
-        sequence_arr=np.array([int(i) for i in sequence])
 
-        pairing_time = 3 + 30 + 5 + 5 + 2 + 2 + 2 #sec
-        experimental_time = len(sequence) * 5 + len(sequence) * 2 #sec
-        ending_time = 3 #sec
-        total_time = pairing_time + experimental_time + ending_time #sec
-        log_data = np.zeros((total_time * Fs))
-        log_data[0:3*Fs] = 0.5 * np.sin(2 * np.pi * np.arange(3*Fs) / (Fs*3)) + 1 #get ready
-        log_data[3*Fs:33*Fs] = np.sin(2 * np.pi * np.arange(30*Fs) / (Fs*2)) + 1 #relax
-        log_data[33*Fs:38*Fs] = 0.5 * np.sin(2 * np.pi * np.arange(5*Fs) / (Fs/2)) + 1 #LRLR
-        log_data[38*Fs:43*Fs] = 0.6 * np.sin(2 * np.pi * np.arange(5*Fs) / (Fs/2)) + 0.4 * np.sin(2 * np.pi * np.arange(5*Fs) / (Fs*2)) + 1 #Teeth Clench
-        log_data[43*Fs:49*Fs] = 0.5 * np.sin(2 * np.pi * np.arange(6*Fs) / (Fs/4)) + 1 #Blink
-        onset_points_0 = 49 * Fs + np.where(sequence_arr==0)[0] * Fs * 5 + (np.where(sequence_arr==0)[0] + 1) * Fs * 2 #additional gap part for 7 -> 7*200
-        onset_points_1 = 49 * Fs + np.where(sequence_arr==1)[0] * Fs * 5 + (np.where(sequence_arr==1)[0] + 1) * Fs * 2
-        for i in onset_points_0:
-            log_data[i:i+5*Fs] = np.ones(5*Fs)
-        for i in onset_points_1:
-            log_data[i:i+5*Fs] = np.ones(5*Fs)*2
-        log_data[(total_time-3) * Fs:] = 0.5 * np.sin(2 * np.pi * np.arange(3*Fs) / (Fs/4)) + 1 #Last blinks
-        
-        return log_data
-    
-    def dynamic_log_data_creator(self, Fs):        
-        
-        for i in range(1, len(self.real_log_data)):
-            self.real_log_data[i] += self.real_log_data[i-1]
-
-        total_time = np.zeros((int(self.real_log_data[-1] * Fs)))
-        
-        sequence = self.real_log_data * Fs
-        sequence = sequence.astype(int)
-        
-        total_time[0:sequence[0]] = 0.5 * np.sin(2 * np.pi * np.arange(sequence[0]) / (Fs*3)) + 1 #get ready
-        total_time[sequence[0]:sequence[1]] = np.sin(2 * np.pi * np.arange(sequence[1]-sequence[0]) / (Fs*2)) + 1 #relax
-        total_time[sequence[1]:sequence[2]] = 0.5 * np.sin(2 * np.pi * np.arange(sequence[2]-sequence[1]) / (Fs/2)) + 1 #LRLR
-        total_time[sequence[2]:sequence[3]] = 0.6 * np.sin(2 * np.pi * np.arange(sequence[3]-sequence[2]) / (Fs/2)) + 0.4 * np.sin(2 * np.pi * np.arange(sequence[3]-sequence[2]) / (Fs*2)) + 1 #Teeth Clench
-        total_time[sequence[3]:sequence[6]] = 0.5 * np.sin(2 * np.pi * np.arange(sequence[6]-sequence[3]) / (Fs/4)) + 1 #Blink
-        
-        for i in np.arange(8, len(self.real_log_data - 1),2):
-            if(sequence[i-8] == 0):
-                total_time[sequence[i-1]:sequence[i]] = np.ones(sequence[i]-sequence[i-1])
-            else:
-                total_time[sequence[i-1]:sequence[i]] = np.ones(sequence[i]-sequence[i-1]) * 2
-                
-        total_time[sequence[-2]:] = 0.5 * np.sin(2 * np.pi * np.arange(3*Fs) / (Fs/4)) + 1 #Last Blinks
-       
-        return total_time
 #%% ========== Main ============        
 if __name__ == "__main__":
     window = Tk()
     callback = GUI(parentWindow=window)
     window.mainloop()
-#%% ======= Area 51 =======
-pickle.dump(sequence, open('sequence','wb'))
-sequence = pickle.load(open('sequence', 'rb'))
-
-#=== Log-data Creation ====
-# sequence_arr=np.array([int(i) for i in sequence])
-
-# Fs=100
-# pairing_time = 3 + 30 + 5 + 5 + 2 + 2 + 2 #sec
-# experimental_time = len(sequence) * 5 + len(sequence) * 2 #sec
-# ending_time = 3 #sec
-# total_time = pairing_time + experimental_time + ending_time #sec
-# log_data = np.zeros((total_time * Fs))
-# log_data[0:3*Fs] = 0.5 * np.sin(2 * np.pi * np.arange(3*Fs) / (Fs*3)) + 1 #get ready
-# log_data[3*Fs:33*Fs] = np.sin(2 * np.pi * np.arange(30*Fs) / (Fs*2)) + 1 #relax
-# log_data[33*Fs:38*Fs] = 0.5 * np.sin(2 * np.pi * np.arange(5*Fs) / (Fs/2)) + 1 #LRLR
-# log_data[38*Fs:43*Fs] = 0.6 * np.sin(2 * np.pi * np.arange(5*Fs) / (Fs/2)) + 0.4 * np.sin(2 * np.pi * np.arange(5*Fs) / (Fs*2)) + 1 #Teeth Clench
-# log_data[43*Fs:49*Fs] = 0.5 * np.sin(2 * np.pi * np.arange(6*Fs) / (Fs/4)) + 1 #Blink
-# onset_points_0 = 49 * Fs + np.where(sequence_arr==0)[0] * Fs * 5 + (np.where(sequence_arr==0)[0] + 1) * Fs * 2 #additional gap part for 7 -> 7*200
-# onset_points_1 = 49 * Fs + np.where(sequence_arr==1)[0] * Fs * 5 + (np.where(sequence_arr==1)[0] + 1) * Fs * 2
-# for i in onset_points_0:
-#     log_data[i:i+5*Fs] = np.ones(5*Fs)
-# for i in onset_points_1:
-#     log_data[i:i+5*Fs] = np.ones(5*Fs)*2
-
-# pickle.dump(log_data, open())
-# plt.plot(log_data)
-#=== Log-data Creation ====
+#%% ====== Area 51 ===========
+# allInitialDateTimes = pickle.load(open('Log Data/' + 'allInitialDateTimes_20-10-15_01-56-28', 'rb'))
+# allLogData = pickle.load(open('Log Data/' + 'allLogData_20-10-15_01-56-28', 'rb'))

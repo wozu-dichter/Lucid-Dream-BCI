@@ -22,7 +22,7 @@ import mne
 import extremeEEGSignalAnalyzer as chetto_EEG
 import os
 chetto_EEG = chetto_EEG.extremeEEGSignalAnalyzer()
-os.chdir('/home/cagatay/Desktop/PhD/LD_BCI/Progress_Reports/1st_One/All_movements/Real_action')
+os.chdir('/home/caghangir/Desktop/PhD/LD_BCI/Progress_Reports/1st_One/All_movements/Real_action')
 import gc
 
 # %matplotlib qt #plot in new window
