@@ -16,11 +16,12 @@ import datetime
 import os
 import sys
 import matplotlib.pyplot as plt
+import winsound
 # %matplotlib qt
 os.chdir('C:/Users/caghangir/Desktop/PhD/Research/Lucid Dream BCI/Codes/GUI/Log')
 #%% =============== Init ===============
 class GUI:
-    def __init__(self, parentWindow, count=0, clenchingTime=5000, restingTime=2000): #milliseconds
+    def __init__(self, parentWindow, count=0, clenchingTime=4000, restingTime=2000): #milliseconds
        self.window = parentWindow
        # self.window.rowconfigure(2, weight=1)
        self.count = count
@@ -31,6 +32,15 @@ class GUI:
        self.real_log_data = np.empty(shape=[0,1])
        
        #===== Time Points Initialization ======
+       #==== Aligning Process ====
+       self.mainIntro = 3 #sec
+       self.relaxing = 30 + 1 #sec 1 sec is beep sound
+       self.clenchingTeeth = 7 #sec
+       self.LRLR = 7 #sec
+       self.blink = 6 #sec
+       self.finishingBlink = 3 #sec
+       #==== Aligning Process ====
+       
        self.startClenchingTime = 100 #just start clenching time to give big value for skipping first calculation!
        self.endClenchingTime = 0
        self.startRestingTime = 100
@@ -100,7 +110,7 @@ class GUI:
         #===== Combobox Clenching Interval ========
         self.comboClInt = ttk.Combobox(self.window)
         self.comboClInt['values']= (2,3,4,5) #clenching times as second
-        self.comboClInt.current(3) #set the selected item
+        self.comboClInt.current(2) #set the selected item
         self.comboClInt.place(relx=0.9, rely=0.01)
         self.comboClInt.bind("<<ComboboxSelected>>", self.changeClenchingInterval)
         #===== Combobox Clenching Interval ========
@@ -231,14 +241,15 @@ class GUI:
         self.startActiontime = time.time() # resting() function looks for clenching time so I had to add this one
         self.lbl.config(font=("Arial Bold", 30))
         self.textAction.set('Get Ready!') #3 seconds
-        self.window.after(3000, self.action_text_changer, 'get ready', 'Please relax yourself for\n 30 seconds')
-        self.window.after(33000, self.action_text_changer, 'relax', 'Please clench your teeth\n as much as possible')
-        self.window.after(38000, self.action_text_changer, 'clench teeth', 'Please perform LRLR eye movements\n as much as possible')
-        self.window.after(43000, self.action_text_changer, 'perform LRLR', 'Please blink as much as possible\n 3')
-        self.window.after(45000, self.action_text_changer, 'blink', 'Please blink as much as possible\n 2')
-        self.window.after(47000, self.action_text_changer, 'blink', 'Please blink as much as possible\n 1')
+        self.window.after(3000, self.action_text_changer, 'get ready', 'Close your eyes and \n relax until beep sound')
+        self.window.after(33000, lambda:winsound.Beep(2500, 1000))
+        self.window.after(34000, self.action_text_changer, 'relax', 'Clench your teeth\n as much as possible')
+        self.window.after(41000, self.action_text_changer, 'clench teeth', 'Perform LRLR eye movements\n as much as possible')
+        self.window.after(48000, self.action_text_changer, 'perform LRLR', 'Blink as much as possible\n 3')
+        self.window.after(50000, self.action_text_changer, 'blink', 'Blink as much as possible\n 2')
+        self.window.after(52000, self.action_text_changer, 'blink', 'Blink as much as possible\n 1')
        
-        self.window.after(49000, lambda:self.resting()) #experiment begin
+        self.window.after(54000, lambda:self.resting()) #experiment begin
     
     def clenching(self, actionType):
         
@@ -323,10 +334,10 @@ class GUI:
         #=== Log-data Saving ====
         
         #=== Plot ====
-        plt.plot(default_EEG)
-        plt.plot(dynamic_EEG)
-        plt.title('Log Data')
-        plt.legend(['Default Log Data', 'Real Log Data'])
+        # plt.plot(default_log_data)
+        # plt.plot(dynamic_log_data)
+        # plt.title('Log Data')
+        # plt.legend(['Default Log Data', 'Real Log Data'])
         #=== Plot ====
 #%% ======== Pseudo-random Sequence Creation ==========        
     def sequenceCreation(self):
@@ -378,24 +389,26 @@ class GUI:
 #%% ============= Log-data to EEG data conversion =========
     def default_log_data_creator(self, Fs, sequence):
         sequence_arr=np.array([int(i) for i in sequence])
-
-        pairing_time = 3 + 30 + 5 + 5 + 2 + 2 + 2 #sec
-        experimental_time = len(sequence) * 5 + len(sequence) * 2 #sec
-        ending_time = 3 #sec
-        total_time = pairing_time + experimental_time + ending_time #sec
+        clenching_sec = int(self.clenchingTime/1000)
+        resting_sec = int(self.restingTime/1000)
+        
+        pairing_time = self.mainIntro + self.relaxing + self.clenchingTeeth + self.LRLR + self.blink #sec
+        experimental_time = len(sequence) * clenching_sec + len(sequence) * resting_sec #sec
+        ending_time = self.finishingBlink #sec
+        total_time = int(pairing_time + experimental_time + ending_time) #sec
         log_data = np.zeros((total_time * Fs))
-        log_data[0:3*Fs] = 0.5 * np.sin(2 * np.pi * np.arange(3*Fs) / (Fs*3)) + 1 #get ready
-        log_data[3*Fs:33*Fs] = np.sin(2 * np.pi * np.arange(30*Fs) / (Fs*2)) + 1 #relax
-        log_data[33*Fs:38*Fs] = 0.5 * np.sin(2 * np.pi * np.arange(5*Fs) / (Fs/2)) + 1 #LRLR
-        log_data[38*Fs:43*Fs] = 0.6 * np.sin(2 * np.pi * np.arange(5*Fs) / (Fs/2)) + 0.4 * np.sin(2 * np.pi * np.arange(5*Fs) / (Fs*2)) + 1 #Teeth Clench
-        log_data[43*Fs:49*Fs] = 0.5 * np.sin(2 * np.pi * np.arange(6*Fs) / (Fs/4)) + 1 #Blink
-        onset_points_0 = 49 * Fs + np.where(sequence_arr==0)[0] * Fs * 5 + (np.where(sequence_arr==0)[0] + 1) * Fs * 2 #additional gap part for 7 -> 7*200
-        onset_points_1 = 49 * Fs + np.where(sequence_arr==1)[0] * Fs * 5 + (np.where(sequence_arr==1)[0] + 1) * Fs * 2
+        log_data[0:3*Fs] = 0.5 * np.sin(2 * np.pi * np.arange(self.mainIntro * Fs) / (Fs*3)) + 1 #get ready
+        log_data[3*Fs:34*Fs] = np.sin(2 * np.pi * np.arange(self.relaxing * Fs) / (Fs*2)) + 1 #relax
+        log_data[34*Fs:41*Fs] = 0.5 * np.sin(2 * np.pi * np.arange(self.clenchingTeeth * Fs) / (Fs/2)) + 1 #LRLR
+        log_data[41*Fs:48*Fs] = 0.6 * np.sin(2 * np.pi * np.arange(self.LRLR * Fs) / (Fs/2)) + 0.4 * np.sin(2 * np.pi * np.arange(self.LRLR * Fs) / (Fs*2)) + 1 #Teeth Clench
+        log_data[48*Fs:54*Fs] = 0.5 * np.sin(2 * np.pi * np.arange(self.blink * Fs) / (Fs/4)) + 1 #Blink
+        onset_points_0 = 54 * Fs + np.where(sequence_arr==0)[0] * Fs * clenching_sec + (np.where(sequence_arr==0)[0] + 1) * Fs * resting_sec #additional gap part for 7 -> 7*200
+        onset_points_1 = 54 * Fs + np.where(sequence_arr==1)[0] * Fs * clenching_sec + (np.where(sequence_arr==1)[0] + 1) * Fs * resting_sec
         for i in onset_points_0:
-            log_data[i:i+5*Fs] = np.ones(5*Fs)
+            log_data[i:i+clenching_sec * Fs] = np.ones(clenching_sec * Fs)
         for i in onset_points_1:
-            log_data[i:i+5*Fs] = np.ones(5*Fs)*2
-        log_data[(total_time-3) * Fs:] = 0.5 * np.sin(2 * np.pi * np.arange(3*Fs) / (Fs/4)) + 1 #Last blinks
+            log_data[i:i+clenching_sec * Fs] = np.ones(clenching_sec * Fs) * 2 #multiply with 2 to differentiate visually
+        log_data[(total_time - self.finishingBlink) * Fs:] = 0.5 * np.sin(2 * np.pi * np.arange(self.finishingBlink * Fs) / (Fs/4)) + 1 #Last blinks
         
         return log_data
     
@@ -430,8 +443,8 @@ if __name__ == "__main__":
     callback = GUI(parentWindow=window)
     window.mainloop()
 #%% ======= Area 51 =======
-pickle.dump(sequence, open('sequence','wb'))
-sequence = pickle.load(open('sequence', 'rb'))
+# self.LRLR
+# sequence = pickle.load(open('sequence', 'rb'))
 
 #=== Log-data Creation ====
 # sequence_arr=np.array([int(i) for i in sequence])
@@ -457,3 +470,9 @@ sequence = pickle.load(open('sequence', 'rb'))
 # pickle.dump(log_data, open())
 # plt.plot(log_data)
 #=== Log-data Creation ====
+# default_log_EEG_data = pickle.load(open('Log Data\default_log_EEG_data_20-07-22_20-03-14', 'rb'))
+# dynamic_log_EEG_data = pickle.load(open('Log Data\dynamic_log_EEG_data_20-07-22_20-03-14', 'rb'))
+# plt.plot(default_log_EEG_data)
+# plt.plot(dynamic_log_EEG_data)
+# plt.title('Log Data')
+# plt.legend(['Default Log Data', 'Real Log Data'])
