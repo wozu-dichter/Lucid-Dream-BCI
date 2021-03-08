@@ -1,4 +1,4 @@
-In order to use guiv1.1.py you need to install relevant packages inside command prompt (cmd) for windows operating systems and
+In order to useguiv115_noserialport_bciandspeech_v4_withserial.py you need to install relevant packages inside command prompt (cmd) for windows operating systems and
 terminal for linux operating systems.
 
 To run the program:
@@ -8,16 +8,9 @@ To run the program:
    * conda install numpy
    * conda install time
 1- go to the folder that guiv1.1.py inside and type this:
-   * python guiv1.1.py
+   * python guiv115_noserialport_bciandspeech_v4_withserial.py
 
 Usage:
-- There are 4 buttons:
-  * Begin : Just initialization and starting button
-  * Pause : Pausing button during process. You should enter Begin button during Pause state to continue
-  * Exit : Exit the program
-  * Reset : Reset all states to initial state
-- There are 2 combobox on the top-right:
-  * Clenching elapsed time (2,3,4,5)
-  * Resting elapsed time (1,2,3,4)
-  * You can change elapsed times during Pause state or initial state and new elapsed times will automatically activate just 
-    after change. 
+- You will see the graphical-user interface (GUI) of Meta-communication with Dreamers.
+- The interface is using the Audio folder to play soothing music, motivational speech and baseline check.
+- Event triggering via port connection is disabled to be able to run the code at any computer apart from the EEG-lab-1 Stimulus computer.
