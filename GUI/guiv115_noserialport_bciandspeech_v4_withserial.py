@@ -19,7 +19,10 @@ import pygame
 import winsound
 import tkvideo
 
-os.chdir('C:/Users/caghangir/Desktop/PhD/Research/Lucid Dream BCI/Codes/GUI')
+abspath = os.path.abspath(sys.argv[0]) 
+dname = os.path.dirname(abspath) #Absoulute directory location where this script is located!
+os.chdir(dname)
+
 current_dir = os.getcwd()
 
 LARGEFONT =("Verdana", 35) 
