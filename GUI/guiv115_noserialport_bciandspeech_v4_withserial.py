@@ -20,6 +20,7 @@ import winsound
 import tkvideo
 
 os.chdir('C:/Users/caghangir/Desktop/PhD/Research/Lucid Dream BCI/Codes/GUI')
+current_dir = os.getcwd()
 
 LARGEFONT =("Verdana", 35) 
    
@@ -103,15 +104,23 @@ class StartPage(tk.Frame):
           
         self.config(background='black')
         self.controller = controller
+
+        #===== Proportional Width/Height =========
+        print("============")
+        print("Current Screen width : %d" % self.winfo_screenwidth())
+        print("Current Screen height : %d" % self.winfo_screenheight())
+        total_width = self.winfo_screenwidth()
+        total_height = self.winfo_screenheight()
+        #===== Proportional Width/Height =========
         
         # label of frame Layout 2 
         label = tk.Label(self, text ="Meta-Communication with Dreamers", font = LARGEFONT, bg="black", fg="white") 
         label.config(font=("Arial Bold", 30))
-          
+        
         # putting the grid in its place by using 
         # grid 
         # label.grid(row = 0, column = 1, padx = 250, pady = 20)  
-        label.place(x=500,y=5,width=800,height=100)
+        label.place(x=total_width/4, y=int(total_height * 0.0057), width=total_width/2, height=total_height * 0.115)
         # image = Image.open("follow_the_whiterabbit.png")
         # image = image.resize((400,300), Image.ANTIALIAS)
         # img = ImageTk.PhotoImage(image)
@@ -121,9 +130,9 @@ class StartPage(tk.Frame):
         # panel.grid(row = 1, column = 1, padx = 250, pady = 10)  
         my_label = tk.Label(self)
         # my_label.grid(row = 1, column = 1, padx = 250, pady = 10)
-        my_label.place(x=500,y=100,width=800,height=500)
+        my_label.place(x=total_width/3, y=total_height * 0.115, width=total_width/3, height=total_height * 0.4)
         #my_label.pack()
-        player = tkvideo.tkvideo("C:/Users/caghangir/Videos/Viddly YouTube Downloader/thematrix_knockknock.mp4", my_label, loop = 1, size = (888,500))
+        player = tkvideo.tkvideo("Media/thematrix_knockknock.mp4", my_label, loop = 1, size = (888,500))
         player.play()
         
         # custom_font = tkFont.Font(family='Helvetica', size=20, weight=tkFont.NORMAL)
@@ -131,45 +140,45 @@ class StartPage(tk.Frame):
         btnDreamBCI = tk.Button(self, text ="Dream BCI", command = lambda : controller.show_frame(DreamBCI), \
                                 bg="black", fg="white", width = 50, height = 3, font=20) 
         # btnDreamBCI.grid(row = 2, column = 1, padx = 250, pady = 10) 
-        btnDreamBCI.place(x=500,y=700,width=800,height=60)
+        btnDreamBCI.place(x=total_width/4.5, y=total_height * 0.55, width=total_width/2, height=total_height * 0.069)
    
         ## button to show frame 2 with text layout2 
         btnSpeech = tk.Button(self, text ="Dream Speech Recognition", command = lambda : controller.show_frame(DreamSpeech), \
                               bg="black", fg="white", width = 50, height = 3, font=20) 
         #btnSpeech.grid(row = 3, column = 1, padx = 250, pady = 10) 
-        btnSpeech.place(x=500,y=800,width=800,height=60)
+        btnSpeech.place(x=total_width/4.5, y=total_height * 0.65, width=total_width/2, height=total_height * 0.069)
    
         btnLucidityInduction = tk.Button(self, text ="Lucidity Induction", command = lambda : controller.show_frame(LucidityInduction), \
                                 bg="black", fg="white", width = 50, height = 1, font=20) 
         # btnLucidityInduction.grid(row = 4, column = 1, padx=250, pady = 10)
-        btnLucidityInduction.place(x=500,y=900,width=800,height=60)     
+        btnLucidityInduction.place(x=total_width/4.5, y=total_height * 0.75, width=total_width/2, height=total_height * 0.069)     
    
         ## button to show frame 2 with text layout2 
         btnExit = tk.Button(self, text ="Exit", command = lambda : controller.exit(), \
                             bg="black", fg="white", width = 50, height = 3, font=20) 
         # btnExit.grid(row = 5, column = 1, padx = 250, pady = 10)  
-        btnExit.place(x=500,y=1000,width=800,height=60)
+        btnExit.place(x=total_width/4.5, y=total_height * 0.85, width=total_width/2, height=total_height * 0.069)
         
         btnMusicandSleep = tk.Button(self, text ="Music and Sleep", command = lambda : controller.show_frame(MusicandSleep), \
 						bg="black", fg="white", width = 15, height = 3, font=15) 
         # btnMusicandSleep.grid(row = 1, column = 1, padx = 0, pady = 0)
-        btnMusicandSleep.place(x=50,y=200,width=400,height=60)
+        btnMusicandSleep.place(x=total_width * 0.032, y=total_height * 0.23, width=total_width * 0.26, height=total_height * 0.069)
         
 		#===== Additional Buttons =========
         btnBaselineCheck = tk.Button(self, text ="Baseline Check", command = lambda : self.baseline_checking(), \
 						bg="black", fg="white", width = 20, height = 3, font=15) 
         # btnBaselineCheck.grid(row = 1, column = 2, padx = 0, pady = 0)
-        btnBaselineCheck.place(x=1500,y=100,width=300,height=60)
+        btnBaselineCheck.place(x=total_width * 0.78 , y=total_height * 0.11, width=total_width * 0.19, height=total_height * 0.069)
 		
         btnMotivationalSpeech_dreamBCI = tk.Button(self, text ="Motivational Speech Dream BCI", command = lambda : self.motivational_speech_LDBCI(), \
 						bg="black", fg="white", width = 28, height = 3, font=20) 
         # btnMotivationalSpeech_dreamBCI.grid(row = 2, column = 2, padx = 0, pady = 0)
-        btnMotivationalSpeech_dreamBCI.place(x=1500,y=300,width=400,height=60)
+        btnMotivationalSpeech_dreamBCI.place(x=total_width * 0.75, y=total_height * 0.347, width=total_width * 0.24, height=total_height * 0.069)
 		
         btnMotivationalSpeech_dreamSpeech = tk.Button(self, text ="Motivational Speech Dream Speech", command = lambda : self.motivational_speech_dreamSpeech(), \
 						bg="black", fg="white", width = 28, height = 3, font=20) 
         # btnMotivationalSpeech_dreamSpeech.grid(row = 3, column = 2, padx = 0, pady = 0)
-        btnMotivationalSpeech_dreamSpeech.place(x=1500,y=400,width=400,height=60)
+        btnMotivationalSpeech_dreamSpeech.place(x=total_width * 0.75, y=total_height * 0.462, width=total_width * 0.24, height=total_height * 0.069)
 		#===== Additional Buttons =========
 		
     def baseline_checking(self):
@@ -183,7 +192,7 @@ class StartPage(tk.Frame):
 	   'finish' : bytearray([55])
        }
 	   
-       os.chdir('C:/Users/caghangir/Desktop/PhD/Research/Lucid Dream BCI/Codes/GUI/Audio')
+       os.chdir(current_dir + '\\Audio')
 
        winsound.PlaySound('baseline_check_openyoureyeslooktotheceiling.wav', winsound.SND_ASYNC)
        time.sleep(3.251)
@@ -242,7 +251,7 @@ class StartPage(tk.Frame):
 	   'whenyoufeelthat' : bytearray([60])
        }
 	
-       os.chdir('C:/Users/caghangir/Desktop/PhD/Research/Lucid Dream BCI/Codes/GUI/Audio/Motivation Speech')
+       os.chdir(current_dir +  '\\Audio\\Motivation Speech')
 
        winsound.PlaySound('1_nowwearegoingtopractice.wav', winsound.SND_ASYNC)
       # self.controller.port.write(self.motivational_speech_events['nowwearegoingto'])
@@ -274,7 +283,7 @@ class StartPage(tk.Frame):
 	   'whenyoufeelthat' : bytearray([60])
        }
 	
-       os.chdir('C:/Users/caghangir/Desktop/PhD/Research/Lucid Dream BCI/Codes/GUI/Audio/Motivation Speech')
+       os.chdir(current_dir +  '\\Audio\\Motivation Speech')
 
        winsound.PlaySound('1_nowwearegoingtopractice.wav', winsound.SND_ASYNC)
        #self.controller.port.write(self.motivational_speech_events['nowwearegoingto'])
@@ -1530,17 +1539,18 @@ class LucidityInduction(tk.Frame):
         self.frequency = 3 #perseq
     
    def audio_visual(self):
-        os.chdir('D:/Users/cagdem/Lucid-Dream-BCI/Visual_Audio_Stimulation')
+        print("Nothing Happens because you are not in the EEG-lab-1!")
+        #os.chdir('D:/Users/cagdem/Lucid-Dream-BCI/Visual_Audio_Stimulation')
         #self.port2.write(str.encode('$rst%'))
         #self.port2.write(str.encode('$1 1 1%'))
-        time.sleep(0.2)
+        #time.sleep(0.2)
         #self.port2.write(str.encode('$1000 3%'))
         #self.port2.write(str.encode('$go%'))
         #self.port2.write(bytearray([4]))
         #self.controller.port.write(bytearray([99]))
 		
-        winsound.PlaySound('Tone01_single.wav', winsound.SND_ASYNC)
-        time.sleep(1.25)
+        #winsound.PlaySound('Tone01_single.wav', winsound.SND_ASYNC)
+        #time.sleep(1.25)
    
    def change_time(self, time):
        self.time = time	 
@@ -1615,7 +1625,7 @@ class MusicandSleep(tk.Frame):
         scrol_y.config(command=self.playlist.yview)
         self.playlist.pack(fill=BOTH)
         # Changing Directory for fetching Songs
-        os.chdir("C:/Users/caghangir/Desktop/PhD/Research/Lucid Dream BCI/Codes/GUI/Audio/Soothing Music")
+        os.chdir(current_dir +  '\\Audio\\Soothing Music')
         # Fetching Songs
         songtracks = os.listdir()
         # Inserting Songs into Playlist
