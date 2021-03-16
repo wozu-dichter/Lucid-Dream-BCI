@@ -4,7 +4,6 @@ from tkinter import ttk
 from tkinter import *
 from tkinter import font as tkFont
 from PIL import ImageTk, Image
-import os
 import serial
 
 import time
@@ -22,8 +21,13 @@ import tkvideo
 abspath = os.path.abspath(sys.argv[0]) 
 dname = os.path.dirname(abspath) #Absoulute directory location where this script is located!
 os.chdir(dname)
-
 current_dir = os.getcwd()
+
+# os.system('python audiovisualization.py')
+# exec(open("audiovisualization.py").read())
+# import subprocess
+# # subprocess.run("python audiovisualization.py", shell=True)
+# subprocess.call("python audiovisualization.py", shell=True)
 
 LARGEFONT =("Verdana", 35) 
    
@@ -37,6 +41,15 @@ class tkinterApp(tk.Tk):
         
         pad=3
         self.geometry("{0}x{1}+0+0".format(self.winfo_screenwidth()-pad, self.winfo_screenheight()-pad))
+        
+        #===== Proportional Width/Height =========
+        print("============")
+        print("Current Screen width : %d" % self.winfo_screenwidth())
+        print("Current Screen height : %d" % self.winfo_screenheight())
+        print("============")
+        self.total_width = self.winfo_screenwidth()
+        self.total_height = self.winfo_screenheight()
+        #===== Proportional Width/Height =========
         
         # creating a container 
         container = tk.Frame(self)   
@@ -107,14 +120,10 @@ class StartPage(tk.Frame):
           
         self.config(background='black')
         self.controller = controller
-
-        #===== Proportional Width/Height =========
-        print("============")
-        print("Current Screen width : %d" % self.winfo_screenwidth())
-        print("Current Screen height : %d" % self.winfo_screenheight())
-        total_width = self.winfo_screenwidth()
-        total_height = self.winfo_screenheight()
-        #===== Proportional Width/Height =========
+        self.window = parent
+        
+        total_width = self.controller.total_width
+        total_height = self.controller.total_height
         
         # label of frame Layout 2 
         label = tk.Label(self, text ="Meta-Communication with Dreamers", font = LARGEFONT, bg="black", fg="white") 
@@ -124,69 +133,117 @@ class StartPage(tk.Frame):
         # grid 
         # label.grid(row = 0, column = 1, padx = 250, pady = 20)  
         label.place(x=total_width/4, y=int(total_height * 0.0057), width=total_width/2, height=total_height * 0.115)
-        # image = Image.open("follow_the_whiterabbit.png")
-        # image = image.resize((400,300), Image.ANTIALIAS)
-        # img = ImageTk.PhotoImage(image)
-        # # img = ImageTk.PhotoImage(file='follow_the_whiterabbit.png')
-        # panel = tk.Label(self, image = img, highlightthickness = 0, borderwidth=0)
-        # panel.image = img
-        # panel.grid(row = 1, column = 1, padx = 250, pady = 10)  
+       
         my_label = tk.Label(self)
-        # my_label.grid(row = 1, column = 1, padx = 250, pady = 10)
         my_label.place(x=total_width/3, y=total_height * 0.115, width=total_width/3, height=total_height * 0.4)
-        #my_label.pack()
         player = tkvideo.tkvideo("Media/thematrix_knockknock.mp4", my_label, loop = 1, size = (888,500))
         player.play()
         
-        # custom_font = tkFont.Font(family='Helvetica', size=20, weight=tkFont.NORMAL)
         
         btnDreamBCI = tk.Button(self, text ="Dream BCI", command = lambda : controller.show_frame(DreamBCI), \
                                 bg="black", fg="white", width = 50, height = 3, font=20) 
-        # btnDreamBCI.grid(row = 2, column = 1, padx = 250, pady = 10) 
         btnDreamBCI.place(x=total_width/4.5, y=total_height * 0.55, width=total_width/2, height=total_height * 0.069)
    
-        ## button to show frame 2 with text layout2 
         btnSpeech = tk.Button(self, text ="Dream Speech Recognition", command = lambda : controller.show_frame(DreamSpeech), \
                               bg="black", fg="white", width = 50, height = 3, font=20) 
-        #btnSpeech.grid(row = 3, column = 1, padx = 250, pady = 10) 
         btnSpeech.place(x=total_width/4.5, y=total_height * 0.65, width=total_width/2, height=total_height * 0.069)
    
         btnLucidityInduction = tk.Button(self, text ="Lucidity Induction", command = lambda : controller.show_frame(LucidityInduction), \
                                 bg="black", fg="white", width = 50, height = 1, font=20) 
-        # btnLucidityInduction.grid(row = 4, column = 1, padx=250, pady = 10)
         btnLucidityInduction.place(x=total_width/4.5, y=total_height * 0.75, width=total_width/2, height=total_height * 0.069)     
    
-        ## button to show frame 2 with text layout2 
         btnExit = tk.Button(self, text ="Exit", command = lambda : controller.exit(), \
                             bg="black", fg="white", width = 50, height = 3, font=20) 
-        # btnExit.grid(row = 5, column = 1, padx = 250, pady = 10)  
         btnExit.place(x=total_width/4.5, y=total_height * 0.85, width=total_width/2, height=total_height * 0.069)
         
         btnMusicandSleep = tk.Button(self, text ="Music and Sleep", command = lambda : controller.show_frame(MusicandSleep), \
 						bg="black", fg="white", width = 15, height = 3, font=15) 
-        # btnMusicandSleep.grid(row = 1, column = 1, padx = 0, pady = 0)
         btnMusicandSleep.place(x=total_width * 0.032, y=total_height * 0.23, width=total_width * 0.26, height=total_height * 0.069)
         
 		#===== Additional Buttons =========
         btnBaselineCheck = tk.Button(self, text ="Baseline Check", command = lambda : self.baseline_checking(), \
 						bg="black", fg="white", width = 20, height = 3, font=15) 
-        # btnBaselineCheck.grid(row = 1, column = 2, padx = 0, pady = 0)
         btnBaselineCheck.place(x=total_width * 0.78 , y=total_height * 0.11, width=total_width * 0.19, height=total_height * 0.069)
+        
+        btnBaselineCheck_beforesleep = tk.Button(self, text ="Baseline Check Before Sleep", command = lambda : self.baseline_checking_before_sleep(), \
+						bg="black", fg="white", width = 20, height = 3, font=15) 
+        btnBaselineCheck_beforesleep.place(x=total_width * 0.78 , y=total_height * 0.2, width=total_width * 0.19, height=total_height * 0.069)
 		
         btnMotivationalSpeech_dreamBCI = tk.Button(self, text ="Motivational Speech Dream BCI", command = lambda : self.motivational_speech_LDBCI(), \
 						bg="black", fg="white", width = 28, height = 3, font=20) 
-        # btnMotivationalSpeech_dreamBCI.grid(row = 2, column = 2, padx = 0, pady = 0)
-        btnMotivationalSpeech_dreamBCI.place(x=total_width * 0.75, y=total_height * 0.347, width=total_width * 0.24, height=total_height * 0.069)
+        btnMotivationalSpeech_dreamBCI.place(x=total_width * 0.75, y=total_height * 0.462, width=total_width * 0.24, height=total_height * 0.069)
 		
         btnMotivationalSpeech_dreamSpeech = tk.Button(self, text ="Motivational Speech Dream Speech", command = lambda : self.motivational_speech_dreamSpeech(), \
 						bg="black", fg="white", width = 28, height = 3, font=20) 
-        # btnMotivationalSpeech_dreamSpeech.grid(row = 3, column = 2, padx = 0, pady = 0)
-        btnMotivationalSpeech_dreamSpeech.place(x=total_width * 0.75, y=total_height * 0.462, width=total_width * 0.24, height=total_height * 0.069)
+        btnMotivationalSpeech_dreamSpeech.place(x=total_width * 0.75, y=total_height * 0.577, width=total_width * 0.24, height=total_height * 0.069)
 		#===== Additional Buttons =========
-		
+        
+        #=== Port connection ====
+        PORT_NAME = 'COM2'
+        BAUDRATE  = 115200
+        #self.port2 = serial.Serial(PORT_NAME,baudrate=BAUDRATE)
+		#=== Port connection ====
+        
     def baseline_checking(self):
 		
        self.baseline_events = {
+	   'close_your_eyes' : bytearray([50]),
+	   'open_your_eyes' : bytearray([51]),
+       'clench_teeth' : bytearray([52]),
+       'LRLR' : bytearray([53]),
+       'eye_blinks' : bytearray([54]),
+	   'finish' : bytearray([55])
+       }
+       
+       self.baseline_check_time = { #absolute time of baseline check .wav
+       'closeyoureyes' : 3000,
+       'openyoureyes' : 27000,
+       'clenchyourteeth' : 46000,
+       'doLRLR' : 65000,
+       'blink' : 78000,
+       'again_clenchyourteeth' : 94000,
+       'again_doLRLR' : 109000,
+       'again_blink' : 122000,
+       'finish' : 136000
+       }
+	   
+       os.chdir(current_dir + '\\Audio')
+       
+       pygame.init()
+       pygame.mixer.init()
+       pygame.mixer.music.load('baseline_check.wav')
+       pygame.mixer.music.play()
+       
+       baseline_check_time = self.baseline_check_time['closeyoureyes']
+        # self.window.after(baseline_check_time, lambda:self.port2.write(str.encode(baseline_events['close_your_eyes'])))
+       
+       baseline_check_time = self.baseline_check_time['openyoureyes']
+       # self.window.after(baseline_check_time, lambda:self.port2.write(str.encode(baseline_events['open_your_eyes'])))
+
+       baseline_check_time = self.baseline_check_time['clenchyourteeth']
+       # self.window.after(baseline_check_time, lambda:self.port2.write(str.encode(baseline_events['clench_teeth'])))
+       
+       baseline_check_time = self.baseline_check_time['doLRLR']
+       # self.window.after(baseline_check_time, lambda:self.port2.write(str.encode(baseline_events['LRLR'])))
+       
+       baseline_check_time = self.baseline_check_time['blink']
+       # self.window.after(baseline_check_time, lambda:self.port2.write(str.encode(baseline_events['eye_blinks'])))
+       
+       baseline_check_time = self.baseline_check_time['again_clenchyourteeth']
+       # self.window.after(baseline_check_time, lambda:self.port2.write(str.encode(baseline_events['clench_teeth'])))
+       
+       baseline_check_time = self.baseline_check_time['again_doLRLR']
+       # self.window.after(baseline_check_time, lambda:self.port2.write(str.encode(baseline_events['LRLR'])))
+       
+       baseline_check_time = self.baseline_check_time['again_blink']
+       # self.window.after(baseline_check_time, lambda:self.port2.write(str.encode(baseline_events['eye_blinks'])))
+       
+       baseline_check_time = self.baseline_check_time['finish']
+       # self.window.after(baseline_check_time, lambda:self.port2.write(str.encode(baseline_events['finish'])))
+		
+    def baseline_checking_before_sleep(self):
+		
+       self.baseline_events_before_sleep = {
 	   'look_totheceiling_eyesopen' : bytearray([50]),
 	   'look_totheceiling_eyesclosed' : bytearray([51]),
        'clench_teeth' : bytearray([52]),
@@ -194,119 +251,87 @@ class StartPage(tk.Frame):
        'eye_blinks' : bytearray([54]),
 	   'finish' : bytearray([55])
        }
+       
+       self.baseline_check_before_sleep_time = { #absolute time of baseline check .wav
+       'openyoureyeslooktotheceiling' : 4000,
+       'closeyoureyeslooktotheceiling' : 24000,
+       'openyoureyes' : 43000,
+       'clenchyourteeth' : 57000,
+       'doLRLR' : 76000,
+       'blink' : 89000,
+       'again_clenchyourteeth' : 105000,
+       'again_doLRLR' : 120000,
+       'again_blink' : 133000,
+       'finish' : 147000
+       }
 	   
        os.chdir(current_dir + '\\Audio')
-
-       winsound.PlaySound('baseline_check_openyoureyeslooktotheceiling.wav', winsound.SND_ASYNC)
-       time.sleep(3.251)
-       #self.controller.port.write(self.baseline_events['look_totheceiling_eyesopen'])
-       time.sleep(15)
-	   
-       winsound.PlaySound('baseline_check_closeyoureyeslooktotheceiling.wav', winsound.SND_ASYNC)
-       time.sleep(3.344)
-       #self.controller.port.write(self.baseline_events['look_totheceiling_eyesclosed'])
-       time.sleep(15)
-	   
-       winsound.PlaySound('baseline_check_openyoureyes.wav', winsound.SND_ASYNC)
-       time.sleep(1.788)
-       time.sleep(3)
-	   
-       winsound.PlaySound('baseline_check_clenchyourteeth.wav', winsound.SND_ASYNC)
-       time.sleep(2.972)
-       #self.controller.port.write(self.baseline_events['clench_teeth'])
-       time.sleep(5)
-	   
-       winsound.PlaySound('baseline_check_LRLR.wav', winsound.SND_ASYNC)
-       time.sleep(3.936)
-       #self.controller.port.write(self.baseline_events['LRLR'])
-       time.sleep(5)
-	   
-       winsound.PlaySound('baseline_check_blink.wav', winsound.SND_ASYNC)
-       time.sleep(1.66)
-       #self.controller.port.write(self.baseline_events['eye_blinks'])
-       time.sleep(5)
-	   
-       winsound.PlaySound('baseline_check_againclenchyourteeth.wav', winsound.SND_ASYNC)
-       time.sleep(2.322)
-       #self.controller.port.write(self.baseline_events['clench_teeth'])
-       time.sleep(5)
-	   
-       winsound.PlaySound('baseline_check_LRLR.wav', winsound.SND_ASYNC)
-       time.sleep(3.936)
-       #self.controller.port.write(self.baseline_events['LRLR'])
-       time.sleep(5)
-	   
-       winsound.PlaySound('baseline_check_blink.wav', winsound.SND_ASYNC)
-       time.sleep(1.66)
-       #self.controller.port.write(self.baseline_events['eye_blinks'])
-       time.sleep(5)
        
-       #self.controller.port.write(self.baseline_events['finish'])
-       winsound.PlaySound('baseline_check_thatsitthankyou.wav', winsound.SND_ASYNC)
+       pygame.init()
+       pygame.mixer.init()
+       pygame.mixer.music.load('baseline_check_before_sleep.wav')
+       pygame.mixer.music.play()
+       
+       baseline_check_time = self.baseline_check_before_sleep_time['openyoureyeslooktotheceiling']
+       # self.window.after(baseline_check_time, lambda:self.port2.write(str.encode(baseline_events_before_sleep['look_totheceiling_eyesopen'])))
+       
+       baseline_check_time = self.baseline_check_before_sleep_time['closeyoureyeslooktotheceiling']
+       # self.window.after(baseline_check_time, lambda:self.port2.write(str.encode(baseline_events_before_sleep['look_totheceiling_eyesclosed'])))
+       
+       baseline_check_time = self.baseline_check_before_sleep_time['openyoureyes']
+
+       baseline_check_time = self.baseline_check_before_sleep_time['clenchyourteeth']
+       # self.window.after(baseline_check_time, lambda:self.port2.write(str.encode(baseline_events_before_sleep['clench_teeth'])))
+       
+       baseline_check_time = self.baseline_check_before_sleep_time['doLRLR']
+       # self.window.after(baseline_check_time, lambda:self.port2.write(str.encode(baseline_events_before_sleep['LRLR'])))
+       
+       baseline_check_time = self.baseline_check_before_sleep_time['blink']
+       # self.window.after(baseline_check_time, lambda:self.port2.write(str.encode(baseline_events_before_sleep['eye_blinks'])))
+       
+       baseline_check_time = self.baseline_check_before_sleep_time['again_clenchyourteeth']
+       # self.window.after(baseline_check_time, lambda:self.port2.write(str.encode(baseline_events_before_sleep['clench_teeth'])))
+       
+       baseline_check_time = self.baseline_check_before_sleep_time['again_doLRLR']
+       # self.window.after(baseline_check_time, lambda:self.port2.write(str.encode(baseline_events_before_sleep['LRLR'])))
+       
+       baseline_check_time = self.baseline_check_before_sleep_time['again_blink']
+       # self.window.after(baseline_check_time, lambda:self.port2.write(str.encode(baseline_events_before_sleep['eye_blinks'])))
+       
+       baseline_check_time = self.baseline_check_before_sleep_time['finish']
+       # self.window.after(baseline_check_time, lambda:self.port2.write(str.encode(baseline_events_before_sleep['finish'])))
 	   
     def motivational_speech_LDBCI(self):
 	
        self.motivational_speech_events = {
-       'nowwearegoingto' : bytearray([56]),
-       'whileyouresthere' : bytearray([57]),
-       'asyounoticed' : bytearray([58]),
-	   'iamgoingtocontinue' : bytearray([59]),
-	   'whenyoufeelthat' : bytearray([60])
+       'speech' : bytearray([56])
        }
 	
        os.chdir(current_dir +  '\\Audio\\Motivation Speech')
-
-       winsound.PlaySound('1_nowwearegoingtopractice.wav', winsound.SND_ASYNC)
-      # self.controller.port.write(self.motivational_speech_events['nowwearegoingto'])
-       time.sleep(18.048 + 8)
-	   
-       winsound.PlaySound('2_whileyouresthere.wav', winsound.SND_ASYNC)
-       #self.controller.port.write(self.motivational_speech_events['whileyouresthere'])
-       time.sleep(49.941 + 8)
-	   
-       winsound.PlaySound('3_asyounoticedthecue.wav', winsound.SND_ASYNC)
-       #self.controller.port.write(self.motivational_speech_events['asyounoticed'])
-       time.sleep(8.757 + 8)
-	   
-       winsound.PlaySound('4_iamgoingtocontinue.wav', winsound.SND_ASYNC)
-       #self.controller.port.write(self.motivational_speech_events['iamgoingtocontinue'])
-       time.sleep(38.613 + 8)
-	   
-       winsound.PlaySound('5_whenyoufeel_dreamBCI.wav', winsound.SND_ASYNC)
-       #self.controller.port.write(self.motivational_speech_events['whenyoufeelthat'])
-       time.sleep(31.659 + 8)
-	   
+       
+       pygame.init()
+       # Initiating Pygame Mixer
+       pygame.mixer.init()
+       
+       pygame.mixer.music.load('dreamBCI.wav')
+       # Playing Selected Song
+       pygame.mixer.music.play()
+      
     def motivational_speech_dreamSpeech(self):
 	
        self.motivational_speech_events = {
-       'nowwearegoingto' : bytearray([56]),
-       'whileyouresthere' : bytearray([57]),
-       'asyounoticed' : bytearray([58]),
-	   'iamgoingtocontinue' : bytearray([59]),
-	   'whenyoufeelthat' : bytearray([60])
+       'speech' : bytearray([56])
        }
 	
        os.chdir(current_dir +  '\\Audio\\Motivation Speech')
 
-       winsound.PlaySound('1_nowwearegoingtopractice.wav', winsound.SND_ASYNC)
-       #self.controller.port.write(self.motivational_speech_events['nowwearegoingto'])
-       time.sleep(18.048 + 8)
-	   
-       winsound.PlaySound('2_whileyouresthere.wav', winsound.SND_ASYNC)
-       #self.controller.port.write(self.motivational_speech_events['whileyouresthere'])
-       time.sleep(49.941 + 8)
-	   
-       winsound.PlaySound('3_asyounoticedthecue.wav', winsound.SND_ASYNC)
-       #self.controller.port.write(self.motivational_speech_events['asyounoticed'])
-       time.sleep(8.757 + 8)
-	   
-       winsound.PlaySound('4_iamgoingtocontinue.wav', winsound.SND_ASYNC)
-       #self.controller.port.write(self.motivational_speech_events['iamgoingtocontinue'])
-       time.sleep(38.613 + 8)
-	   
-       winsound.PlaySound('6_whenyoufeel_dreamSpeech.wav', winsound.SND_ASYNC)
-       #self.controller.port.write(self.motivational_speech_events['whenyoufeelthat'])
-       time.sleep(57.557 + 8)   
+       pygame.init()
+       # Initiating Pygame Mixer
+       pygame.mixer.init()
+       
+       pygame.mixer.music.load('dreamSpeech.wav')
+       # Playing Selected Song
+       pygame.mixer.music.play()
    
 #%% ============================= Dream BCI =======================
 class DreamBCI(tk.Frame): 
@@ -326,18 +351,17 @@ class DreamBCI(tk.Frame):
        self.initialize_user_interface(controller)
        self.real_log_data = np.empty(shape=[0])
        
+       self.total_width = self.controller.total_width
+       self.total_height = self.controller.total_height
+       
        #===== Time Points Initialization ======
        #==== Aligning Process ====
      
        self.elapsedTimes = {
            'main_intro' : 3000,
-           'relaxing' : 31000,
-           'beep_sound' : 1000,
-           'clench_teeth' : 7000,
-           'LRLR' : 7000,
-           'blink' : 6000,
-           'finish_blink' : 3000,
-           'beeping_sound' : 1000
+           'relaxing' : 10000,
+           'countdown' : 1000,
+           'blink' : 1000
            }
        #==== Aligning Process ====
        
@@ -363,8 +387,6 @@ class DreamBCI(tk.Frame):
        self.allInitialDateTimes = {
            'get_ready' : None,
            'relax' : None,
-           'clench_teeth' : None,
-           'perform_LRLR' : None,
            'blink' : list(),
            'left' : list(),
            'right' : list(),
@@ -411,11 +433,9 @@ class DreamBCI(tk.Frame):
        self.BYTEVALUES = {
  	   'get_ready' : bytearray([4]),
  	   'relax' : bytearray([5]),
-       'beep_sound' : bytearray([6]),
- 	   'clench_teeth' : bytearray([7]),
- 	   'perform_LRLR' : bytearray([8]),
- 	   'blink' : bytearray([9]),
- 	   'finish' : bytearray([10]),
+       'countdown' : bytearray([6]), 
+       'blink' : bytearray([7]),
+ 	   'finish' : bytearray([8]),
        'left'  : bytearray([1]),
        'right' : bytearray([2]),
        'rest'  : bytearray([3]),
@@ -515,6 +535,10 @@ class DreamBCI(tk.Frame):
         self.comboRestInt.place(relx=0.9, rely=0.045)
         self.comboRestInt.bind("<<ComboboxSelected>>", self.changeRestingInterval)
         #===== Combobox Resting Interval ========
+        
+        self.btnSubmit = Button(self, text="Submit", bg="black", fg="white", font=custom_font, command=self.finish_protocol)
+        self.btnSubmit.place(relx=0.5, rely=0.7, anchor='center')
+        self.btnSubmit.place_forget() #hide the button
         
         # self.window.mainloop()
     
@@ -651,6 +675,8 @@ class DreamBCI(tk.Frame):
     #%% ========================= Actions ============================
     
     def settingSequence(self):
+        
+        os.chdir(current_dir)
         self.sequence = pickle.load(open('Sequences/sequence', 'rb')) #82 amount is for all 3 combinations
         self.sequence = self.sequence[0:60] #decrease a bit
               
@@ -682,32 +708,21 @@ class DreamBCI(tk.Frame):
         
         self.startActiontime = time.time() # resting() function looks for clenching time so I had to add this one
        
-        self.action_text_event_creator(textaction='Get Ready!', event_text='get_ready',\
+        self.action_text_event_creator(textaction='Welcome!', event_text='get_ready',\
                                           event_type='normal', append=False, relx=0.5, rely=0.5)
         total_time = self.elapsedTimes['main_intro']
         
-        self.window.after(total_time, self.action_text_changer, 'relax', 'Close your eyes and \n relax until beep sound', 'get ready')
+        self.window.after(total_time, self.action_text_changer, 'relax', 'Just relax yourself', 'get ready')
         total_time += self.elapsedTimes['relaxing']
         
-		#beep sound
-        self.window.after(total_time, lambda:winsound.Beep(2500, 1000))
-        total_time += self.elapsedTimes['beep_sound']
+        self.window.after(total_time, self.action_text_changer, 'countdown', 'You will begin in \n 3 seconds', 'relax')
+        total_time += self.elapsedTimes['countdown']
         
-        self.window.after(total_time, self.action_text_changer, 'clench_teeth', 'Clench your teeth\n as much as possible', 'relax')
-        total_time += self.elapsedTimes['clench_teeth']
+        self.window.after(total_time, self.action_text_changer, 'countdown', 'You will begin in \n 2 seconds', 'countdown')
+        total_time += self.elapsedTimes['countdown']
         
-        self.window.after(total_time, self.action_text_changer, 'perform_LRLR', 'Perform LRLR eye movements\n as much as possible', \
-                          'clench teech')
-        total_time += self.elapsedTimes['LRLR']
-        
-        self.window.after(total_time, self.action_text_changer, 'blink', 'Blink as much as possible\n 3', 'perform LRLR')
-        total_time += int(self.elapsedTimes['blink'] / 3)
-        
-        self.window.after(total_time, self.action_text_changer, 'blink', 'Blink as much as possible\n 2', 'blink')
-        total_time += int(self.elapsedTimes['blink'] / 3)
-        
-        self.window.after(total_time, self.action_text_changer, 'blink', 'Blink as much as possible\n 1', 'blink')
-        total_time += int(self.elapsedTimes['blink'] / 3)
+        self.window.after(total_time, self.action_text_changer, 'countdown', 'You will begin in \n 1 seconds', 'countdown')
+        total_time += self.elapsedTimes['countdown']
         
         self.window.after(total_time, lambda:self.resting()) #experiment begin
     
@@ -777,11 +792,33 @@ class DreamBCI(tk.Frame):
                                        event_type='normal', append=True)
         
         self.startActiontime = time.time()
-        self.window.after(3000, self.finish_protocol)
+        self.window.after(3000, self.attention_questionnaire)
 
 #%% ========================= Finish Protocols ==================================
 
+    def attention_questionnaire(self):
+        self.textAction.set("")
+        self.scale = Scale(self, label='Please rate your attention level from 1 to 10', from_=1, to=10, orient=tk.HORIZONTAL, length=int(self.total_width/3), showvalue=0, tickinterval=1, resolution=1, font=30, command=self.print_attention_level)
+        self.scale.place(relx=0.5, rely=0.5, anchor='center')
+        self.btnSubmit.place(relx=0.5, rely=0.6, anchor='center')
+        
+    def print_attention_level(self, v):
+        print('Attention level is : %s' % v)
+
     def finish_protocol(self):
+        
+        #==== Events About Attention Level =====
+        self.scale.place_forget()
+        self.btnSubmit.place_forget()
+        attention_level = self.scale.get()
+        
+        dateTime = str(datetime.datetime.now().strftime('%y-%m-%d_%H-%M-%S'))
+        date = str(datetime.datetime.now().strftime('%y-%m-%d')) #name of the file
+        file_object = open('Log Data/Dream BCI/Attention Levels/' + date + '.txt',"a+")
+        file_object.write(dateTime + '  :: %s\n' % attention_level)
+        file_object.close()
+        #==== Events About Attention Level =====
+        
         self.action_text_changer(textaction='The End', event_text='finish', finished_action='finished')
 
         self.btnBegin.config(state = NORMAL)
@@ -795,9 +832,8 @@ class DreamBCI(tk.Frame):
         self.real_log_data = np.append(self.real_log_data, 3) #manually add
                 
         '''=========== Save Data ============'''
-        default_log_time = np.array([self.elapsedTimes['main_intro'], self.elapsedTimes['relaxing'], self.elapsedTimes['clench_teeth'], \
-                                     self.elapsedTimes['LRLR'], int(self.elapsedTimes['blink'] / 3), int(self.elapsedTimes['blink'] / 3), \
-                                     int(self.elapsedTimes['blink'] / 3)])
+        default_log_time = np.array([self.elapsedTimes['main_intro'], self.elapsedTimes['relaxing'], self.elapsedTimes['countdown'], \
+                                     self.elapsedTimes['countdown'], self.elapsedTimes['countdown']])
         default_log_time = default_log_time / 1000
             
         for i in range(len(self.sequence)):
@@ -821,6 +857,8 @@ class DreamBCI(tk.Frame):
         self.lbl4.after(self.textLogTime, self.log_delete)
         print('Log Data has been saved into the directory!')
         #=== Log-data Saving ====
+        
+        self.count = 0
 
     def freetiming_finish_protocol(self):
         
@@ -865,6 +903,8 @@ class DreamBCI(tk.Frame):
         self.lbl4.after(self.textLogTime, self.log_delete)
         print('Log Data has been saved into the directory!')
         '''============== Log-data Saving =================='''
+        
+        self.count = 0
     
 		
 #%% ==================================== Free Timing Session ============================================
@@ -1018,12 +1058,15 @@ class DreamBCI(tk.Frame):
 ''' ============================================================= Dream Speech ========================================================== '''  
 # third window frame page2 
 class DreamSpeech(tk.Frame):  
-    def __init__(self, parent, controller, count=0, utteranceTime=2000, restingTime=2000, selected_wordPairs=0, totalLength=12): 
+    def __init__(self, parent, controller, count=0, utteranceTime=3000, restingTime=2000, selected_wordPairs=2, totalLength=12): 
         tk.Frame.__init__(self, parent) 
         
         self.config(background='black')
         self.controller = controller 
         self.window = parent
+        
+        self.total_width = self.controller.total_width
+        self.total_height = self.controller.total_height
         
         self.selected_wordPairs = selected_wordPairs
         self.sequence = list()
@@ -1038,13 +1081,9 @@ class DreamSpeech(tk.Frame):
         #==== Aligning Process ====
         self.elapsedTimes = {
            'main_intro' : 3000,
-           'relaxing' : 31000,
-           'beep_sound' : 1000,
-           'clench_teeth' : 7000,
-           'LRLR' : 7000,
-           'blink' : 6000,
-           'finish_blink' : 3000,
-           'beeping_sound' : 1000
+           'relaxing' : 10000,
+           'countdown' : 1000,
+           'blink' : 1000
            }
        #==== Aligning Process ====
         
@@ -1056,8 +1095,6 @@ class DreamSpeech(tk.Frame):
         self.allInitialDateTimes = {
            'get_ready' : None,
            'relax' : None,
-           'clench_teeth' : None,
-           'perform_LRLR' : None,
            'blink' : list(),
            'speak' : list(),
            'rest' : list(),
@@ -1081,11 +1118,9 @@ class DreamSpeech(tk.Frame):
         self.BYTEVALUES = {
  	    'get_ready' : bytearray([4]),
  	    'relax' : bytearray([5]),
-        'beep_sound' : bytearray([6]),
- 	    'clench_teeth' : bytearray([7]),
- 	    'perform_LRLR' : bytearray([8]),
- 	    'blink' : bytearray([9]),
- 	    'finish' : bytearray([10]),
+        'countdown' : bytearray([6]),
+        'blink' : bytearray([7]),
+ 	    'finish' : bytearray([8]),
          
  	    'speak' : bytearray([1]),
         'rest'  : bytearray([2])
@@ -1106,28 +1141,28 @@ class DreamSpeech(tk.Frame):
         # ===== Text Combobox Clenching Time Interval ======
         self.textComboboxWP = StringVar()
         self.textComboboxWP.set("Word Pair Type :")
-        self.lbl1 = Label(self, textvariable=self.textComboboxWP, font=("Arial Bold", 15), foreground='white', background='black')
+        self.lbl1 = Label(self, textvariable=self.textComboboxWP, font=("Arial Bold", 11), foreground='white', background='black')
         self.lbl1.place(relx=0.83, rely=0.02, anchor='center')
         # ===== Text Combobox Clenching Time Interval ======
         
         # ===== Text Combobox Clenching Time Interval ======
         self.textComboboxClTiInt = StringVar()
         self.textComboboxClTiInt.set("Utterance Elapsed Time (Sec) :")
-        self.lbl2 = Label(self, textvariable=self.textComboboxClTiInt, font=("Arial Bold", 15), foreground='white', background='black')
+        self.lbl2 = Label(self, textvariable=self.textComboboxClTiInt, font=("Arial Bold", 11), foreground='white', background='black')
         self.lbl2.place(relx=0.83, rely=0.055, anchor='center')
         # ===== Text Combobox Clenching Time Interval ======
         
         # ===== Text Combobox Resting Time Interval ======
         self.textComboboxRstTiInt = StringVar()
         self.textComboboxRstTiInt.set("Resting Elapsed Time (Sec) :")
-        self.lbl3 = Label(self, textvariable=self.textComboboxRstTiInt, font=("Arial Bold", 15), foreground='white', background='black')
+        self.lbl3 = Label(self, textvariable=self.textComboboxRstTiInt, font=("Arial Bold", 11), foreground='white', background='black')
         self.lbl3.place(relx=0.83, rely=0.08, anchor='center')
         # ===== Text Combobox Resting Time Interval ======
         
         # ===== Text Combobox Session Length ======
         self.textComboboxSL = StringVar()
         self.textComboboxSL.set("Amount of Words :")
-        self.lbl5 = Label(self, textvariable=self.textComboboxSL, font=("Arial Bold", 15), foreground='white', background='black')
+        self.lbl5 = Label(self, textvariable=self.textComboboxSL, font=("Arial Bold", 11), foreground='white', background='black')
         self.lbl5.place(relx=0.83, rely=0.115, anchor='center')
         # ===== Text Combobox Session Length ======
         
@@ -1156,12 +1191,16 @@ class DreamSpeech(tk.Frame):
         self.btnMainMenu = Button(self, text="Main Menu", bg="black", fg="white", font=custom_font, \
                                   command=lambda: controller.show_frame(StartPage))
         self.btnMainMenu.grid(column=6, row=0)
+        
+        self.btnSubmit = Button(self, text="Submit", bg="black", fg="white", font=custom_font, command=self.finish_protocol)
+        self.btnSubmit.place(relx=0.5, rely=0.7, anchor='center')
+        self.btnSubmit.place_forget() #hide the button
         # ====== Button ===========
         
         #====== Word Pair Selection =======
         self.comboWP = ttk.Combobox(self)
         self.comboWP['values']= ("Man, Eats, Food", "Dream, Speech", "Left, Right, Up, Down") #clenching times as second
-        self.comboWP.current(0) #set the selected item
+        self.comboWP.current(2) #set the selected item
         self.comboWP.place(relx=0.9, rely=0.01)
         self.comboWP.bind("<<ComboboxSelected>>", self.change_wordPairs)
         #====== Word Pair Selection =======
@@ -1193,6 +1232,8 @@ class DreamSpeech(tk.Frame):
 
 #%% ========================== Button Actions ===========================
     def beginClicked(self):
+        os.chdir(current_dir)
+        
         print('Program is beginning!')
         global doTick
         doTick = True
@@ -1301,32 +1342,21 @@ class DreamSpeech(tk.Frame):
         
         self.startActiontime = time.time() # resting() function looks for clenching time so I had to add this one
        
-        self.action_text_event_creator(textaction='Get Ready!', event_text='get_ready',\
+        self.action_text_event_creator(textaction='Welcome!', event_text='get_ready',\
                                        append=False, relx=0.5, rely=0.5)
         total_time = self.elapsedTimes['main_intro']
         
-        self.window.after(total_time, self.action_text_changer, 'relax', 'Close your eyes and \n relax until beep sound', 'get_ready')
+        self.window.after(total_time, self.action_text_changer, 'relax', 'Just relax yourself', 'get ready')
         total_time += self.elapsedTimes['relaxing']
         
-		#beep sound
-        self.window.after(total_time, lambda:winsound.Beep(2500, 1000))
-        total_time += self.elapsedTimes['beep_sound']
-		
-        self.window.after(total_time, self.action_text_changer, 'clench_teeth', 'Clench your teeth\n as much as possible', 'relax')
-        total_time += self.elapsedTimes['clench_teeth']
+        self.window.after(total_time, self.action_text_changer, 'countdown', 'You will begin in \n 3 seconds', 'relax')
+        total_time += self.elapsedTimes['countdown']
         
-        self.window.after(total_time, self.action_text_changer, 'perform_LRLR', 'Perform LRLR eye movements\n as much as possible', \
-                          'clench teech')
-        total_time += self.elapsedTimes['LRLR']
+        self.window.after(total_time, self.action_text_changer, 'countdown', 'You will begin in \n 2 seconds', 'countdown')
+        total_time += self.elapsedTimes['countdown']
         
-        self.window.after(total_time, self.action_text_changer, 'blink', 'Blink as much as possible\n 3', 'perform_LRLR')
-        total_time += int(self.elapsedTimes['blink'] / 3)
-        
-        self.window.after(total_time, self.action_text_changer, 'blink', 'Blink as much as possible\n 2', 'blink')
-        total_time += int(self.elapsedTimes['blink'] / 3)
-        
-        self.window.after(total_time, self.action_text_changer, 'blink', 'Blink as much as possible\n 1', 'blink')
-        total_time += int(self.elapsedTimes['blink'] / 3)
+        self.window.after(total_time, self.action_text_changer, 'countdown', 'You will begin in \n 1 seconds', 'countdown')
+        total_time += self.elapsedTimes['countdown']
         
         self.window.after(total_time, lambda:self.resting()) #experiment begin
         
@@ -1435,14 +1465,14 @@ class DreamSpeech(tk.Frame):
                                        append=True)
         
         self.startActiontime = time.time()
-        self.window.after(3000, self.finish_protocol) 
+        self.window.after(3000, self.attention_questionnaire) 
 
 #%% ============================= Special Functions ======================
     def action_text_event_creator(self, textaction, event_text, append=False, relx=0.5, rely=0.5):
         self.textAction.set(textaction)
         self.lbl.place(relx=relx, rely=rely, anchor='center')
         #self.port.write(self.BYTEVALUES[event_text]) #stimulus
-        self.controller.port.write(self.BYTEVALUES[event_text])
+        #self.controller.port.write(self.BYTEVALUES[event_text])
         #print(str(self.BYTEVALUES[event_text]))
 		
         current_time = datetime.datetime.now().strftime('%y-%m-%d_%H-%M-%S.%f')[:-3]
@@ -1457,7 +1487,30 @@ class DreamSpeech(tk.Frame):
         '''==== Current time Adding ====='''
         
 #%% ========================= Finish Protocols ==================================
+
+    def attention_questionnaire(self):
+        self.textAction.set("")
+        self.scale = Scale(self, label='Please rate your attention level from 1 to 10', from_=1, to=10, orient=tk.HORIZONTAL, length=int(self.total_width/3), showvalue=0, tickinterval=1, resolution=1, font=30, command=self.print_attention_level)
+        self.scale.place(relx=0.5, rely=0.5, anchor='center')
+        self.btnSubmit.place(relx=0.5, rely=0.6, anchor='center')
+        
+    def print_attention_level(self, v):
+        print('Attention level is : %s' % v)
+
     def finish_protocol(self):
+        
+        #==== Events About Attention Level =====
+        self.scale.place_forget()
+        self.btnSubmit.place_forget()
+        attention_level = self.scale.get()
+        
+        dateTime = str(datetime.datetime.now().strftime('%y-%m-%d_%H-%M-%S'))
+        date = str(datetime.datetime.now().strftime('%y-%m-%d')) #name of the file
+        file_object = open('Log Data/Dream Speech/Attention Levels/' + date + '.txt',"a+")
+        file_object.write(dateTime + '  :: %s\n' % attention_level)
+        file_object.close()
+        #==== Events About Attention Level =====
+        
         self.action_text_changer(textaction='The End', event_text='finish', finished_action='finished')
 
         self.btnBegin.config(state = NORMAL)
@@ -1471,9 +1524,8 @@ class DreamSpeech(tk.Frame):
         self.real_log_data = np.append(self.real_log_data, 3) #manually add
                 
         '''=========== Save Data ============'''
-        default_log_time = np.array([self.elapsedTimes['main_intro'], self.elapsedTimes['relaxing'], self.elapsedTimes['clench_teeth'], \
-                                     self.elapsedTimes['LRLR'], int(self.elapsedTimes['blink'] / 3), int(self.elapsedTimes['blink'] / 3), \
-                                     int(self.elapsedTimes['blink'] / 3)])
+        default_log_time = np.array([self.elapsedTimes['main_intro'], self.elapsedTimes['relaxing'], self.elapsedTimes['countdown'], \
+                                     self.elapsedTimes['countdown'], self.elapsedTimes['countdown']])
         default_log_time = default_log_time / 1000
             
         for i in range(len(self.sequence)):
@@ -1570,7 +1622,9 @@ class MusicandSleep(tk.Frame):
     
    def __init__(self, parent, controller):  
         tk.Frame.__init__(self, parent) 
-          
+        
+        print("Music and sleep has begun")
+        
         self.config(background='black')
         self.controller = controller
         
@@ -1637,6 +1691,10 @@ class MusicandSleep(tk.Frame):
               
         #======================== Music Player Frame ==================================  
         
+        #================ Exec File ==================
+        
+        #================ Exec File ==================
+        
         #======================== Other Functions ===================================
         self.btnMainMenu = tk.Button(self, text="Main Menu", fg="white", bg="black", width = 150, \
                                         height = 5, font=20, command=lambda: controller.show_frame(StartPage))
@@ -1645,6 +1703,8 @@ class MusicandSleep(tk.Frame):
         #======================== Other Functions ===================================
     
    def startsong(self):
+        os.chdir(current_dir +  '\\Audio\\Soothing Music')
+       
         # Displaying Selected Song title
         self.track.set(self.playlist.get(ACTIVE))
         # Displaying Status
@@ -1657,6 +1717,8 @@ class MusicandSleep(tk.Frame):
         #self.port2.write(str.encode(play_sound_events['play']))
         
    def stopsong(self):
+        os.chdir(current_dir +  '\\Audio\\Soothing Music')
+       
         # Displaying Status
         self.status.set("-Stopped")
         # Stopped Song
@@ -1665,6 +1727,8 @@ class MusicandSleep(tk.Frame):
         #self.port2.write(str.encode(play_sound_events['stop']))
     
    def pausesong(self):
+        os.chdir(current_dir +  '\\Audio\\Soothing Music')
+       
         # Displaying Status
         self.status.set("-Paused")
         # Paused Song
@@ -1673,6 +1737,8 @@ class MusicandSleep(tk.Frame):
         #self.port2.write(str.encode(play_sound_events['pause']))
         
    def playsong(self):
+        os.chdir(current_dir +  '\\Audio\\Soothing Music')
+       
         # It will Display the  Status
         self.status.set("-Playing")
         # Playing back Song
